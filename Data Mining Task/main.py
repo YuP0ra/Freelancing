@@ -1,12 +1,15 @@
 from pymining import seqmining
 
-with open('reviews_sample.txt') as file:
+SAMPLES_PATH = 'reviews_sample.txt'
+SUPPORT = 100
+
+with open(SAMPLES_PATH) as file:
     lines = file.read().split('\n')
 
 for i, line in enumerate(lines):
     lines[i] = line.split(' ')
 
-freq_seqs = sorted(seqmining.freq_seq_enum(lines, 100))
+freq_seqs = sorted(seqmining.freq_seq_enum(lines, SUPPORT))
 
 with open('patterns.txt', 'w') as file:
     for res in freq_seqs:
