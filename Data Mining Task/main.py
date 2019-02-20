@@ -1,4 +1,3 @@
-from pymining import seqmining
 from libs import ContiguousSequentialPatterns
 
 
@@ -11,7 +10,7 @@ with open(SAMPLES_PATH) as file:
 for i, line in enumerate(lines):
     lines[i] = line.split(' ')
 
-freq_seqs = ContiguousSequentialPatterns(lines, SUPPORT, 10).patterns()
+freq_seqs = ContiguousSequentialPatterns(lines, SUPPORT, 3).patterns()
 
 with open('patterns.txt', 'w') as file:
     for k in freq_seqs:

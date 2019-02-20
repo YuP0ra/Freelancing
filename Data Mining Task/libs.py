@@ -11,11 +11,11 @@ class ContiguousSequentialPatterns:
         full_lookup_dict = defaultdict(int)
         final_dict = defaultdict(int)
 
-        for loop_max_len in range(1, self.max_seq_len + 1):
-            for line in self.seq_lines:
+        for line in self.seq_lines:
+            for cegment_len in range(1, self.max_seq_len + 1):
                 temp_line_set = []
-                for i in range(len(line) - loop_max_len):
-                    segment = ' '.join(line[i: i + loop_max_len])
+                for i in range(len(line) - cegment_len + 1):
+                    segment = ' '.join(line[i: i + cegment_len])
                     if not segment in temp_line_set:
                         temp_line_set.append(segment)
                         full_lookup_dict[segment] += 1
