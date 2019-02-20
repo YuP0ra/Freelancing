@@ -1,4 +1,6 @@
 from pymining import seqmining
+from libs import ContiguousSequentialPatterns
+
 
 SAMPLES_PATH = 'reviews_sample.txt'
 SUPPORT = 100
@@ -9,8 +11,8 @@ with open(SAMPLES_PATH) as file:
 for i, line in enumerate(lines):
     lines[i] = line.split(' ')
 
-freq_seqs = sorted(seqmining.freq_seq_enum(lines, SUPPORT))
+freq_seqs = ContiguousSequentialPatterns(lines, SUPPORT, 10).patterns()
 
 with open('patterns.txt', 'w') as file:
-    for res in freq_seqs:
-        file.write(str(res[1]) + ':' + ';'.join(res[0])+'\n')
+    for k in freq_seqs:
+        file.write(str(freq_seqs[k]) + ':' + ';'.join(k.split(' '))+'\n')
