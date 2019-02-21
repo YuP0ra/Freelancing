@@ -4,43 +4,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include<stdbool.h>
-#include<errno.h>
-FILE * out_file ; // output file
+#include <stdbool.h>
+#include <errno.h>
+
+
 const int MAX = 5 , MAXW = 100;
-void remove_endl(char line[])
-{
-    int i = 0 , sz = strlen(line);
-    for( i =0;i<sz;i++)
-    {
-        if(line[i] == '\n')
-        {
-            line[i] = '\0';
-            return ;
-        }
-    }
-}
 
-void split_word(char line[] , char  *commands[] ) // " \t\r\n\a"
-{
-    int i =0;
-    int sz = 1;
-   
-    commands[i] = strtok(line , " \t\r\n\a");
-   
-
-    if(commands[i] == NULL)
-        return ;
-    while(commands[i] != NULL )
-    {
-        i++;
-       
-        commands[i] = strtok(NULL, " \t\r\n\a");
-
-    }
-
-
-}
 FILE *fp ;
 int read_line(char line[] , char *commands[])
 {
@@ -61,58 +30,68 @@ int read_line(char line[] , char *commands[])
             line = (char *)realloc(line, sz + 2);
         }
     } while (1);
-    remove_endl(line);
-    int ret = 1;
-    puts("in ras");
 
-   split_word(line, commands);
-return ret ;
-}
 
-int launch(char *commands[])
-{
-    pid_t pid;
- if(strcasecmp(commands[0] , "cd") == 0)
+    // remove endline
+    int i = 0 , sz = strlen(line);
+    for( i =0;i<sz;i++)
     {
-        if(chdir(commands[1]) == -1)
+        if(line[i] == '\n')
         {
-             perror("shell");
-            return 1;
+            line[i] = '\0';
+            return ;
         }
     }
-    pid = fork();
 
-    if (pid == 0) {
-    // Child process
+     i =0;
+     sz = 1;
 
-    if (strcmp(commands[0], "cd") != 0 && execvp(commands[0], commands) == -1) {
-        perror("shell");
-    }
-    exit(1);
-    } else if (pid < 0) {
-    // Error forking
-     perror("shell");
-    } else {
-    // Parent process
-    wait(NULL);
-    }
+     commands[i] = strtok(line , " \t\r\n\a");
 
-    return 1;
 
+     if(commands[i] == NULL)
+         return ;
+     while(commands[i] != NULL )
+     {
+         i++;
+
+         commands[i] = strtok(NULL, " \t\r\n\a");
+
+     }
+
+     return 1 ;
 }
 
 int excute(char *commands[])
 {
     if(commands[0] == NULL)
-        {
-            puts("NO Command");
-            return 1;
-        }
+        return 1;
+
     if(strcmp( commands[0],  "exit") == 0)
         exit(0);
-    return launch(commands);
 
+    pid_t pid = fork();
+
+    if (!pid)
+    {
+      if (execvp(commands[0], commands) == -1)
+      {
+        perror("shell");
+      }
+      exit(0);
+    }
+    else if (pid < 0)
+    {
+      perror("shell");
+    }
+    else
+    {
+      wait(NULL);
+    }
+
+    return 1;
 }
+
 void shell_loop(int argc,const char *argv[])
 {
     if(argc == 1)
@@ -135,8 +114,8 @@ void shell_loop(int argc,const char *argv[])
     ok  =read_line(line , commands);
     if(ok)
         status = excute( commands);
-       
-        
+
+
     } while (status);
 
 }
