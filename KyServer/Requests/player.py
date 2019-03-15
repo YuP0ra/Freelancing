@@ -11,7 +11,11 @@ def onConnectionTimeout(client):
 
 
 def onConnectionEnded(client):
-    pass
+    print("Connection Terminated: ", client.address)
+
+
+def PLAYER_INFO(client, request):
+    print("FROM DEF PLAYER INFO: ", request)
 
 
 def DEFAULT(client, request):

@@ -2,10 +2,13 @@ import os, json, socket, secrets, importlib
 from threading import Thread
 from socket import timeout
 
+from . import database
+
 
 class GameServer(Thread):
     def __init__(self, HOSTNAME, PORT, requestHandlerPath='./Requests/'):
         Thread.__init__(self,)
+        database.init()
 
         self.__moudles = {}
         self.__methods = {}
@@ -33,7 +36,6 @@ class GameServer(Thread):
             # Load the moudle into python then excute it
             loader = importlib.machinery.SourceFileLoader(script[:-3], self.PATH + script)
             objectModule = loader.load_module()
-            loader.exec_module(objectModule)
 
             # register the moudle
             self.__moudles[script] = objectModule
@@ -44,7 +46,6 @@ class GameServer(Thread):
                 if not method in self.__methods:
                     self.__methods[method] = []
                 self.__methods[method].append(getattr(objectModule, method))
-
 
     def processClientEvents(self, client, event):
         if event in self.__methods:
@@ -63,14 +64,20 @@ class GameServer(Thread):
 
 
 class RemoteClient(Thread):
+    RemoteClientID = 0
     def __init__(self, socket, address, kernel):
         Thread.__init__(self)
         socket.settimeout(5)
+        RemoteClient.RemoteClientID += 1
 
-        self._socket =socket
-        self._kernel = kernel
+        self._socket    = socket
+        self._kernel    = kernel
 
-        self.address = address
+        self.address    = address
+        self.token      = RemoteClient.RemoteClientID
+
+    def __eq__(self, other):
+        pass
 
     def run(self,):
         self.on_client_connect()
@@ -82,7 +89,7 @@ class RemoteClient(Thread):
 
             for request in requests:
                 self.process_request(request)
-
+        self.on_client_disconnect()
 
     def on_client_connect(self,):
         self._kernel.processClientEvents(self, "onConnectionStarted")
@@ -93,7 +100,6 @@ class RemoteClient(Thread):
     def on_client_disconnect(self,):
         self._kernel.processClientEvents(self, "onConnectionEnded")
         quit()
-
 
     def send_data(self, data_dict):
         """ Convert the dict into json and append the EndOfFile mark """
