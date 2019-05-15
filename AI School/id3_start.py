@@ -86,10 +86,10 @@ def get_class_labels(data, target_attribute):
 
 
 def entropy(n, labels):
-    ent = None # initialize entropy
+    ent = 0
     for label in labels.keys():
-        p_x = None # compute probability
-        ent += - None # compute probability
+        p_x = labels[label] / n
+        ent -=  p_x * math.log(p_x, 2)
     return ent
 
 
